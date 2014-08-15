@@ -1,0 +1,21 @@
+*.class
+dist/
+dump.rdb
+dbdump.sh
+
+# Package Files #
+bin/*.jar
+bin/*.xml
+*.war
+*.ear
+
+# Mac OS 
+.DS_Store
+
+atlas.jar
+atlas.txt
+logs
+logback.out.xml
+/bin
+pnls/
+*.csv
