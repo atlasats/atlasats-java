@@ -1,4 +1,4 @@
-package com.atlas.common;
+package com.atlas.account;
 
 /**
  * 

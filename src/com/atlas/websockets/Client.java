@@ -1,6 +1,7 @@
 package com.atlas.websockets;
 
 
+
 public class Client {
 
 	public void connect () {
@@ -19,12 +20,15 @@ public class Client {
 		this.secret = secret;
 	}
 
-	public void subscribe (Subscription sub) {
+	public void subscribeMarketData (MarketDataListener listener, Subscription sub) {
 		switch (sub) {
 			
 		}
 	}
 	
+	public void subscribeAccountData (AccountUpdateListener listener, Subscription sub) {
+		
+	}
 	
 	private String uri;
 	private String key;
