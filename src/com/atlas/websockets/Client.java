@@ -1,12 +1,13 @@
 package com.atlas.websockets;
 
-import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 
 import org.eclipse.jetty.websocket.client.WebSocketClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.atlas.account.AccountListener;
+import com.atlas.marketdata.MarketDataListener;
 
 public class Client {
 
@@ -15,14 +16,11 @@ public class Client {
 		jettyWSClient = new WebSocketClient ();
 	}
 
-	// AtlasClient
-	
 	public void connect () {
 		try {
 			jettyWSClient.start ();
 			jettyWSClient.connect (new Socket (), new URI (uri));
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace ();
 		}
 	}
@@ -45,12 +43,10 @@ public class Client {
 		}
 	}
 
-	public void subscribeAccountData (AccountUpdateListener listener, Subscription sub) {
+	public void subscribeAccountData (AccountListener listener, Subscription sub) {
 
 	}
 
-	// AtlasClient (END)
-	
 	private String uri;
 	private String key;
 	private String secret;
