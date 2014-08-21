@@ -1,43 +1,61 @@
 package com.atlas.websockets;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
-public class Client implements WSEventHandler {
+import org.eclipse.jetty.websocket.client.WebSocketClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-	public void connect () {
-		socket = new WebSocket (uri, this);
+public class Client {
+
+	public Client () {
+		log = LoggerFactory.getLogger (getClass ());
+		jettyWSClient = new WebSocketClient ();
 	}
+
+	// AtlasClient
 	
+	public void connect () {
+		try {
+			jettyWSClient.start ();
+			jettyWSClient.connect (new Socket (), new URI (uri));
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace ();
+		}
+	}
+
 	public void setUri (String uri) {
 		this.uri = uri;
 	}
-	
+
 	public void setKey (String key) {
 		this.key = key;
 	}
-	
+
 	public void setSecret (String secret) {
 		this.secret = secret;
 	}
 
-	@Override
-	public void sendMessage () {
-		// TODO Auto-generated method stub
-		
-	}
-
 	public void subscribeMarketData (MarketDataListener listener, Subscription sub) {
 		switch (sub) {
-			
+
 		}
 	}
-	
+
 	public void subscribeAccountData (AccountUpdateListener listener, Subscription sub) {
-		
+
 	}
+
+	// AtlasClient (END)
 	
 	private String uri;
 	private String key;
 	private String secret;
-	
-	private WebSocket socket;
+
+	private WebSocketClient jettyWSClient;
+	private Logger log;
+
 }
