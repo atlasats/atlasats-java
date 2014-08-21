@@ -17,7 +17,6 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
-import java.util.logging.Logger;
 
 import org.slf4j.LoggerFactory;
 
@@ -150,26 +149,7 @@ class WebSocket implements Runnable {
 		return this.readyState;
 	}
 
-	/**
-	 * Return the object listening for WebSocket events
-	 * 
-	 * @return WebSocketListener instance
-	 */
-	// public WebSocketListener getListener() {
-	// return this.listener;
-	// }
-
-	/**
-	 * Set the object listening for WebSocket events
-	 * 
-	 * @param listener
-	 *            WebSocketListener instance
-	 */
-	// public void setListener(WebSocketListener listener) {
-	// this.listener = listener;
-	// }
-
-	/**
+		/**
 	 * Expose the WebSocket unique ID
 	 * 
 	 * @return ID as String

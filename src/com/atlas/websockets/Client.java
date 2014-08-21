@@ -4,6 +4,7 @@ package com.atlas.websockets;
 public class Client implements WSEventHandler {
 
 	public void connect () {
+		socket = new WebSocket (uri, this);
 	}
 	
 	public void setUri (String uri) {
@@ -37,4 +38,6 @@ public class Client implements WSEventHandler {
 	private String uri;
 	private String key;
 	private String secret;
+	
+	private WebSocket socket;
 }
