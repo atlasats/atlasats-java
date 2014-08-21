@@ -2,7 +2,6 @@ package com.atlas.websockets;
 
 import com.atlas.account.Account;
 import com.atlas.account.Order;
-import com.atlas.common.*;
 
 public interface AccountUpdateListener {
 
