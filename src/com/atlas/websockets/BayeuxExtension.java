@@ -1,9 +1,10 @@
 package com.atlas.websockets;
 
+import com.atlas.common.Message;
 
 public interface BayeuxExtension {
 
-	String incoming (String message);
+	boolean incoming (Message message);
 	
-	String outgoing (String message);
+	boolean outgoing (OutMessage message);
 }
