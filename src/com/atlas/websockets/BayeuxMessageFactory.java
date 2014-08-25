@@ -50,9 +50,12 @@ public class BayeuxMessageFactory {
 		return message;
 	}
 	
+	// WebSocket channels
 	public static final String CHANNEL_HANDSHAKE = "/meta/handshake";
 	public static final String CHANNEL_SUBSCRIBE = "/meta/subscribe";
 	public static final String CHANNEL_MARKET = "/market";
+	public static final String CHANNEL_LEVEL1 = "/level1";
+	// JSON keys
 	public static final String KEY_CHANNEL = "channel";
 	public static final String KEY_CLIENTID = "clientId";
 	public static final String KEY_ERROR = "error";

@@ -28,7 +28,7 @@ public abstract class Subscription extends OutMessage {
 	private String clientId;
 	
 	public static final Subscription LEVEL1 = new Subscription () {
-		public String getSubscriptionName () { return ""; }
+		public String getSubscriptionName () { return "/level1"; }
 	};
 	
 	public static final Subscription TRADES = new Subscription () {

@@ -12,6 +12,21 @@ public class Quote {
 		this.mm = mm;
 	}
 	
+	@Override
+	public String toString () {
+		StringBuilder sb = new StringBuilder ();
+		sb.append (symbol);
+		sb.append ('|');
+		sb.append (mm);
+		sb.append ('|');
+		sb.append (side);
+		sb.append ('|');
+		sb.append (price);
+		sb.append ('|');
+		sb.append (size);
+		return sb.toString ();
+	}
+	
 	public OrderSide getSide () {
 		return side;
 	}

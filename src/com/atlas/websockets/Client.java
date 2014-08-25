@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import com.atlas.account.AccountListener;
 import com.atlas.common.Message;
 import com.atlas.marketdata.Book;
+import com.atlas.marketdata.L1Update;
 import com.atlas.marketdata.MarketDataListener;
 import com.atlas.marketdata.MessageFactory;
 import com.atlas.orders.OrderListener;
@@ -190,15 +191,6 @@ public class Client {
 		return false;
 	}
 
-	private void process (BayeuxMessage message) {
-		if (message.getChannel ().equals (BayeuxMessageFactory.CHANNEL_MARKET)) {
-			Book book = MessageFactory.book (message.getData ());
-			for (MarketDataListener l : marketListeners) {
-				l.handle (book);
-			}
-		}
-	}
-	
 	private boolean preprocess (BayeuxMessage message) {
 		for (BayeuxExtension ext : extensions) {
 			if (!ext.incoming (message)) {
@@ -209,6 +201,20 @@ public class Client {
 		return true;
 	}
 
+	private void process (BayeuxMessage message) {
+		if (message.getChannel ().equals (BayeuxMessageFactory.CHANNEL_MARKET)) {
+			Book book = MessageFactory.book (message.getData ());
+			for (MarketDataListener l : marketListeners) {
+				l.handle (book);
+			}
+		} else if (message.getChannel ().equals (BayeuxMessageFactory.CHANNEL_LEVEL1)) {
+			L1Update l1up = MessageFactory.createL1 (message.getData ());
+			for (MarketDataListener l : marketListeners) {
+				l.handle (l1up);
+			}
+		}
+	}
+	
 	private boolean send (OutMessage message) {
 		if (session == null) {
 			log.error ("no session");
