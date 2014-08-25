@@ -18,8 +18,9 @@ import org.slf4j.LoggerFactory;
 
 import com.atlas.account.AccountListener;
 import com.atlas.common.Message;
-import com.atlas.common.Handshake;
+import com.atlas.marketdata.Book;
 import com.atlas.marketdata.MarketDataListener;
+import com.atlas.marketdata.MessageFactory;
 import com.atlas.orders.OrderListener;
 import com.atlas.orders.stateful.StatefulOrderListener;
 
@@ -74,32 +75,26 @@ public class Client {
 		this.session = session;
 		handshake ();
 	}
-
+	
 	@OnWebSocketMessage
 	public void onMessage (String jsonString) {
-		Collection<Message> messages = JSON.parse (jsonString);
-		for (Message message : messages) {
-			for (BayeuxExtension ext : extensions) {
-				if (!ext.incoming (message)) {
-					log.info (ext + " discarded in-message " + message);
-					return;
-				}
-			}
+		Collection<BayeuxMessage> messages = BayeuxMessageFactory.create (jsonString);
+		for (BayeuxMessage message : messages) {
+			if (!preprocess (message)) continue;
 			log.debug ("processing in-message: " + message);
 			switch (message.getType ()) {
+			case ERROR:
+				log.info ("error: " + message.getError ());
+				break;
 			case HANDSHAKE:
-				clientId = ((Handshake) message).getClientId ();
-				if (clientId == null) {
-					log.warn ("no clientId in handshake");
-				} else {
-					state = ConnectionState.CONNECTED;
-				}
+				clientId = message.getClientId ();
+				state = ConnectionState.CONNECTED;
 				break;
 			case SUBSCRIPTION:
-				log.info (message.toString ());
+				log.info ("subscribed: " + message.getSubscription ());
 				break;
 			default:
-				log.warn ("unknown in-message type: " + message.getType ());
+				process (message);
 				break;
 			}
 		}
@@ -195,6 +190,25 @@ public class Client {
 		return false;
 	}
 
+	private void process (BayeuxMessage message) {
+		if (message.getChannel ().equals (BayeuxMessageFactory.CHANNEL_MARKET)) {
+			Book book = MessageFactory.book (message.getData ());
+			for (MarketDataListener l : marketListeners) {
+				l.handle (book);
+			}
+		}
+	}
+	
+	private boolean preprocess (BayeuxMessage message) {
+		for (BayeuxExtension ext : extensions) {
+			if (!ext.incoming (message)) {
+				log.info (ext + " discarding in-message " + message);
+				return false;
+			}
+		}
+		return true;
+	}
+
 	private boolean send (OutMessage message) {
 		if (session == null) {
 			log.error ("no session");
@@ -203,10 +217,10 @@ public class Client {
 		} else {
 			// process extensions
 			for (BayeuxExtension ext : extensions) {
-				if (!ext.outgoing (message)) {
-					log.info (ext + " discarded " + message);
-					return false;
-				}
+//				if (!ext.outgoing (message)) {
+//					log.info (ext + " discarded " + message);
+//					return false;
+//				}
 			}
 			log.info (message.toString ());
 			Future<Void> fut = session.getRemote ().sendStringByFuture (message.toJSON ());

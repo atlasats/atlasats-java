@@ -10,8 +10,8 @@ public abstract class Subscription extends OutMessage {
 	@Override
 	public String toJSON () {
 		JSONObject json = new JSONObject ();
-		json.put ("channel", JSON.CHANNEL_SUBSCRIBE);
-		json.put (JSON.KEY_CLIENTID, clientId);
+		json.put ("channel", BayeuxMessageFactory.CHANNEL_SUBSCRIBE);
+		json.put (BayeuxMessageFactory.KEY_CLIENTID, clientId);
 		json.put ("subscription", getSubscriptionName ());
 		return json.toString ();
 	}

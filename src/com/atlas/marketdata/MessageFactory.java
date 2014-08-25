@@ -1,5 +1,6 @@
 package com.atlas.marketdata;
 
+import java.nio.channels.SeekableByteChannel;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -11,9 +12,9 @@ import com.atlas.orders.OrderSide;
 
 public class MessageFactory {
 
-	public static Book book (JSONObject json) {
+	public static Book book (String json) {
 		Book book = new Book ();
-		JSONObject data = json.getJSONObject ("data");
+		JSONObject data = new JSONObject (json);
 		book.setSymbol (data.getString ("symbol"));
 		book.setCurrency (data.getString ("currency"));
 		book.setOpen (data.getDouble ("open"));
@@ -43,6 +44,11 @@ public class MessageFactory {
 	}
 	
 	public static Quote quote (JSONObject json) {
-		return null;
+		OrderSide side = json.getString ("side").equals ("BUY") ? OrderSide.BUY : OrderSide.SELL;
+		String symbol = json.getString ("symbol");
+		String mm = json.getString ("mm");
+		double price = json.getDouble ("price");
+		double size = json.getDouble ("size");
+		return new Quote (side, symbol, mm, price, size);
 	}
 }
