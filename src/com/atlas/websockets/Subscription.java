@@ -11,7 +11,7 @@ public abstract class Subscription extends OutMessage {
 	public String toJSON () {
 		JSONObject json = new JSONObject ();
 		json.put ("channel", BayeuxMessageFactory.CHANNEL_SUBSCRIBE);
-		json.put (BayeuxMessageFactory.KEY_CLIENTID, clientId);
+		json.put (BayeuxMessageFactory.KEY_CLIENTID, getClientId ());
 		json.put ("subscription", getSubscriptionName ());
 		return json.toString ();
 	}
@@ -20,12 +20,6 @@ public abstract class Subscription extends OutMessage {
 	public String toString () {
 		return "out:subscription " + getSubscriptionName ();
 	}
-	
-	void setClientId (String clientId) {
-		this.clientId = clientId;
-	}
-
-	private String clientId;
 	
 	public static final Subscription LEVEL1 = new Subscription () {
 		public String getSubscriptionName () { return "/level1"; }

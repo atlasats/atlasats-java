@@ -17,7 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.atlas.account.AccountListener;
-import com.atlas.common.Message;
 import com.atlas.marketdata.Book;
 import com.atlas.marketdata.L1Update;
 import com.atlas.marketdata.MarketDataListener;
@@ -110,12 +109,12 @@ public class Client {
 		this.uri = uri;
 	}
 
-	public void setKey (String key) {
-		this.key = key;
+	public void setAPIKey (String key) {
+		this.apiToken = key;
 	}
 
-	public void setSecret (String secret) {
-		this.secret = secret;
+	public void setAPISecret (String secret) {
+		this.apiSecret = secret;
 	}
 
 	// Configuration (END)
@@ -138,7 +137,7 @@ public class Client {
 	}
 
 	public boolean subscribe (AccountListener listener) {
-		if (subscribe (new AccountSubscription (key, secret))) {
+		if (subscribe (new AccountSubscription (apiToken, apiSecret))) {
 			synchronized (accountListeners) {
 				if (!accountListeners.contains (listener)) {
 					accountListeners.add (listener);
@@ -150,7 +149,7 @@ public class Client {
 	}
 
 	public boolean subscribe (OrderListener listener) {
-		if (subscribe (new OrderSubscription (key, secret))) {
+		if (subscribe (new OrderSubscription (apiToken, apiSecret))) {
 			synchronized (orderListeners) {
 				if (!orderListeners.contains (listener)) {
 					orderListeners.add (listener);
@@ -162,7 +161,7 @@ public class Client {
 	}
 
 	public boolean subscribe (StatefulOrderListener listener) {
-		if (subscribe (new StatefulSubscription (key, secret))) {
+		if (subscribe (new StatefulSubscription (apiToken, apiSecret))) {
 			synchronized (statefulListeners) {
 				if (!statefulListeners.contains (listener)) {
 					statefulListeners.add (listener);
@@ -214,7 +213,6 @@ public class Client {
 				l.handle (l1up);
 			}
 		} else if (message.getChannel ().equals (BayeuxMessageFactory.CHANNEL_TRADES)) {
-			
 			Trade trade = MessageFactory.trade (message.getData ());
 			for (MarketDataListener l : marketListeners) {
 				l.handle (trade);
@@ -244,8 +242,8 @@ public class Client {
 
 	// config/credentials
 	private String uri;
-	private String key;
-	private String secret;
+	private String apiToken;
+	private String apiSecret;
 
 	private WebSocketClient jettyWSClient;
 
