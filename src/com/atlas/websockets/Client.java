@@ -22,6 +22,7 @@ import com.atlas.marketdata.Book;
 import com.atlas.marketdata.L1Update;
 import com.atlas.marketdata.MarketDataListener;
 import com.atlas.marketdata.MessageFactory;
+import com.atlas.marketdata.Trade;
 import com.atlas.orders.OrderListener;
 import com.atlas.orders.stateful.StatefulOrderListener;
 
@@ -208,9 +209,15 @@ public class Client {
 				l.handle (book);
 			}
 		} else if (message.getChannel ().equals (BayeuxMessageFactory.CHANNEL_LEVEL1)) {
-			L1Update l1up = MessageFactory.createL1 (message.getData ());
+			L1Update l1up = MessageFactory.level1 (message.getData ());
 			for (MarketDataListener l : marketListeners) {
 				l.handle (l1up);
+			}
+		} else if (message.getChannel ().equals (BayeuxMessageFactory.CHANNEL_TRADES)) {
+			
+			Trade trade = MessageFactory.trade (message.getData ());
+			for (MarketDataListener l : marketListeners) {
+				l.handle (trade);
 			}
 		}
 	}

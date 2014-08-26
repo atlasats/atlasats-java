@@ -14,7 +14,7 @@ public class L1Update {
 		return symbol;
 	}
 
-	public void setSymbol (String symbol) {
+	void setSymbol (String symbol) {
 		this.symbol = symbol;
 	}
 
@@ -22,7 +22,7 @@ public class L1Update {
 		return currency;
 	}
 
-	public void setCurrency (String currency) {
+	void setCurrency (String currency) {
 		this.currency = currency;
 	}
 
@@ -30,7 +30,7 @@ public class L1Update {
 		return bid;
 	}
 
-	public void setBid (double bid) {
+	void setBid (double bid) {
 		this.bid = bid;
 	}
 
@@ -38,7 +38,7 @@ public class L1Update {
 		return bidSize;
 	}
 
-	public void setBidSize (double bidSize) {
+	void setBidSize (double bidSize) {
 		this.bidSize = bidSize;
 	}
 
@@ -46,7 +46,7 @@ public class L1Update {
 		return ask;
 	}
 
-	public void setAsk (double ask) {
+	void setAsk (double ask) {
 		this.ask = ask;
 	}
 
@@ -62,7 +62,7 @@ public class L1Update {
 		return last;
 	}
 
-	public void setLast (double last) {
+	void setLast (double last) {
 		this.last = last;
 	}
 
@@ -70,7 +70,7 @@ public class L1Update {
 		return lastSize;
 	}
 
-	public void setLastSize (double lastSize) {
+	void setLastSize (double lastSize) {
 		this.lastSize = lastSize;
 	}
 
@@ -78,7 +78,7 @@ public class L1Update {
 		return volume;
 	}
 
-	public void setVolume (double volume) {
+	void setVolume (double volume) {
 		this.volume = volume;
 	}
 
@@ -86,7 +86,7 @@ public class L1Update {
 		return change;
 	}
 
-	public void setChange (double change) {
+	void setChange (double change) {
 		this.change = change;
 	}
 

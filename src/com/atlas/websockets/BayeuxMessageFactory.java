@@ -55,6 +55,8 @@ public class BayeuxMessageFactory {
 	public static final String CHANNEL_SUBSCRIBE = "/meta/subscribe";
 	public static final String CHANNEL_MARKET = "/market";
 	public static final String CHANNEL_LEVEL1 = "/level1";
+	public static final String CHANNEL_TRADES = "/trades";
+	
 	// JSON keys
 	public static final String KEY_CHANNEL = "channel";
 	public static final String KEY_CLIENTID = "clientId";

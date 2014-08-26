@@ -1,27 +1,32 @@
 package com.atlas.marketdata;
 
+import java.util.Date;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.atlas.common.TickType;
 import com.atlas.orders.OrderSide;
 
 
 public class MessageFactory {
 
 	public static Book book (String json) {
-		Book book = new Book ();
+		Book b = new Book ();
 		JSONObject data = new JSONObject (json);
-		book.setSymbol (data.getString ("symbol"));
-		book.setCurrency (data.getString ("currency"));
-		book.setOpen (data.getDouble ("open"));
-		book.setHigh (data.getDouble ("high"));
-		book.setLow (data.getDouble ("low"));
-		book.setLast (data.getDouble ("last"));
-		book.setAverage (data.getDouble ("average"));
-		book.setVolume (data.getDouble ("volume"));
+		b.setSymbol (data.getString ("symbol"));
+		b.setCurrency (data.getString ("currency"));
+		b.setOpen (data.getDouble ("open"));
+		b.setHigh (data.getDouble ("high"));
+		b.setLow (data.getDouble ("low"));
+		b.setLast (data.getDouble ("last"));
+		b.setAverage (data.getDouble ("average"));
+		b.setVolume (data.getDouble ("volume"));
 		List<Quote> bids = new LinkedList<Quote> ();
 		List<Quote> offers = new LinkedList<Quote> ();
 		JSONArray quotes = data.getJSONArray ("quotes");
@@ -33,29 +38,48 @@ public class MessageFactory {
 				offers.add (q);
 			}
 		}
-		book.setBids (bids);
-		book.setOffers (offers);
-		return book;
+		b.setBids (bids);
+		b.setOffers (offers);
+		return b;
 	}
 	/**
 	 * Parse this: {"last":100,"symbol":"BTC","change":-0.8058,"volume":10,"ask":520,"bidsize":1,"lastsize":1.1,"bid":460,"asksize":1,"currency":"USD"}
 	 * @param json
 	 * @return
 	 */
-	public static L1Update createL1 (String jsonString) {
-		L1Update l1up = new L1Update ();
+	public static L1Update level1 (String jsonString) {
+		L1Update l1 = new L1Update ();
 		JSONObject json = new JSONObject (jsonString);
-		l1up.setLast (json.getDouble ("last"));
-		l1up.setSymbol (json.getString ("symbol"));
-		l1up.setChange (json.getDouble ("change"));
-		l1up.setVolume (json.getDouble ("volume"));
-		l1up.setAsk (json.getDouble ("ask"));
-		l1up.setBidSize (json.getDouble ("bidsize"));
-		l1up.setLastSize (json.getDouble ("lastsize"));
-		l1up.setBid (json.getDouble ("bid"));
-		l1up.setAskSize (json.getDouble ("asksize"));
-		l1up.setCurrency (json.getString ("currency"));
-		return l1up;
+		l1.setLast (json.getDouble ("last"));
+		l1.setSymbol (json.getString ("symbol"));
+		l1.setChange (json.getDouble ("change"));
+		l1.setVolume (json.getDouble ("volume"));
+		l1.setAsk (json.getDouble ("ask"));
+		l1.setBidSize (json.getDouble ("bidsize"));
+		l1.setLastSize (json.getDouble ("lastsize"));
+		l1.setBid (json.getDouble ("bid"));
+		l1.setAskSize (json.getDouble ("asksize"));
+		l1.setCurrency (json.getString ("currency"));
+		return l1;
+	}
+	
+	/**
+	 * Parse this: {"tick":"UP","time":"2014-08-25 23:51:26","price":520,"symbol":"BTC","seq":1408992758,"venue":"CROX","size":0.001,"currency":"USD"}
+	 * @param jsonString
+	 * @return
+	 */
+	public static Trade trade (String jsonString) {
+		Trade t = new Trade ();
+		JSONObject json = new JSONObject (jsonString);
+		t.setTick (TickType.valueOf (json.getString ("tick")));
+		t.setTime (parse (json.getString ("time")));
+		t.setPrice (json.getDouble ("price"));
+		t.setSymbol (json.getString ("symbol"));
+		t.setSequence (json.getLong ("seq"));
+		t.setVenue (json.getString ("venue"));
+		t.setSize (json.getDouble ("size"));
+		t.setCurrency (json.getString ("currency"));
+		return t;
 	}
 	
 	public static Quote quote (JSONObject json) {
@@ -66,4 +90,15 @@ public class MessageFactory {
 		double size = json.getDouble ("size");
 		return new Quote (side, symbol, mm, price, size);
 	}
+	
+	private static Date parse (String dateStr) {
+		try {
+			return dateFormat.parse (dateStr);
+		} catch (ParseException e) {
+		}
+		return null;
+	}
+	
+	private static final DateFormat dateFormat = new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss");
+
 }
