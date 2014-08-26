@@ -31,38 +31,24 @@ public class BayeuxMessageFactory {
 	
 	private static BayeuxMessage parse (JSONObject json) {
 		BayeuxMessage message = new BayeuxMessage ();
-		if (json.has (KEY_ERROR)) {
+		if (json.has (JSONKeys.ERROR)) {
 			message.setType (BayeuxMessageType.ERROR);
-			message.setError (json.getString (KEY_ERROR));
+			message.setError (json.getString (JSONKeys.ERROR));
+			return message;
 		}
-		String channel = json.getString (KEY_CHANNEL);
-		if (channel.equals (CHANNEL_HANDSHAKE)) {
+		String channel = json.getString (JSONKeys.CHANNEL);
+		if (channel.equals (Channels.HANDSHAKE)) {
 			message.setType (BayeuxMessageType.HANDSHAKE);
-			message.setClientId (json.getString (KEY_CLIENTID));
-		} else if (channel.equals (CHANNEL_SUBSCRIBE)) {
+			message.setClientId (json.getString (JSONKeys.CLIENTID));
+		} else if (channel.equals (Channels.SUBSCRIBE)) {
 			message.setType (BayeuxMessageType.SUBSCRIPTION);
-			message.setSubscription (json.getString (KEY_SUBSCRIPTION));
+			message.setSubscription (json.getString (JSONKeys.SUBSCRIPTION));
 		} else {
 			message.setType (BayeuxMessageType.DATA);
-			message.setData (json.getString (KEY_DATA));
+			message.setData (json.getString (JSONKeys.DATA));
 			message.setChannel (channel);
 		}
 		return message;
 	}
 	
-	// WebSocket channels
-	public static final String CHANNEL_HANDSHAKE = "/meta/handshake";
-	public static final String CHANNEL_SUBSCRIBE = "/meta/subscribe";
-	public static final String CHANNEL_MARKET = "/market";
-	public static final String CHANNEL_LEVEL1 = "/level1";
-	public static final String CHANNEL_TRADES = "/trades";
-	
-	// JSON keys
-	public static final String KEY_CHANNEL = "channel";
-	public static final String KEY_CLIENTID = "clientId";
-	public static final String KEY_ERROR = "error";
-	
-	private static final String KEY_SUBSCRIPTION = "subscription";
-	private static final String KEY_DATA = "data";
-
 }

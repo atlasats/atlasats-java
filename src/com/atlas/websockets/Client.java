@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.atlas.account.AccountListener;
+import com.atlas.common.AtlasAPIException;
 import com.atlas.marketdata.Book;
 import com.atlas.marketdata.L1Update;
 import com.atlas.marketdata.MarketDataListener;
@@ -34,6 +35,7 @@ public class Client {
 		closeLatch = new CountDownLatch (1);
 		state = ConnectionState.DISCONNECTED;
 		extensions = new LinkedList<BayeuxExtension> ();
+		extensions.add (new BayeuxExtensionNoAuth ());
 		accountListeners = new LinkedList<AccountListener> ();
 		orderListeners = new LinkedList<OrderListener> ();
 		statefulListeners = new LinkedList<StatefulOrderListener> ();
@@ -50,10 +52,6 @@ public class Client {
 		} catch (Exception e) {
 			log.error ("error connecting to WS server", e);
 		}
-	}
-
-	public void addExtension (BayeuxExtension ext) {
-		extensions.add (ext);
 	}
 
 	public boolean awaitClose (int duration, TimeUnit unit) throws InterruptedException {
@@ -88,8 +86,12 @@ public class Client {
 				log.info ("error: " + message.getError ());
 				break;
 			case HANDSHAKE:
-				clientId = message.getClientId ();
 				state = ConnectionState.CONNECTED;
+				synchronized (extensions) {
+					BayeuxExtension ext = new BayeuxExtensionClientId (message.getClientId ());
+					if (extensions.contains (ext)) extensions.remove (ext);
+					extensions.add (ext);
+				}
 				break;
 			case SUBSCRIPTION:
 				log.info ("subscribed: " + message.getSubscription ());
@@ -109,12 +111,16 @@ public class Client {
 		this.uri = uri;
 	}
 
-	public void setAPIKey (String key) {
-		this.apiToken = key;
+	public void setAPIToken (String token) {
+		if (state != ConnectionState.DISCONNECTED) throw new AtlasAPIException ("set API token/secret before connecting");
+		this.apiToken = token;
+		setExtensions ();
 	}
 
 	public void setAPISecret (String secret) {
+		if (state != ConnectionState.DISCONNECTED) throw new AtlasAPIException ("set API token/secret before connecting");
 		this.apiSecret = secret;
+		setExtensions ();
 	}
 
 	// Configuration (END)
@@ -137,7 +143,7 @@ public class Client {
 	}
 
 	public boolean subscribe (AccountListener listener) {
-		if (subscribe (new AccountSubscription (apiToken, apiSecret))) {
+		if (subscribe (new AccountSubscription ())) {
 			synchronized (accountListeners) {
 				if (!accountListeners.contains (listener)) {
 					accountListeners.add (listener);
@@ -149,7 +155,7 @@ public class Client {
 	}
 
 	public boolean subscribe (OrderListener listener) {
-		if (subscribe (new OrderSubscription (apiToken, apiSecret))) {
+		if (subscribe (new OrderSubscription ())) {
 			synchronized (orderListeners) {
 				if (!orderListeners.contains (listener)) {
 					orderListeners.add (listener);
@@ -161,7 +167,7 @@ public class Client {
 	}
 
 	public boolean subscribe (StatefulOrderListener listener) {
-		if (subscribe (new StatefulSubscription (apiToken, apiSecret))) {
+		if (subscribe (new StatefulSubscription ())) {
 			synchronized (statefulListeners) {
 				if (!statefulListeners.contains (listener)) {
 					statefulListeners.add (listener);
@@ -174,16 +180,17 @@ public class Client {
 
 	// Subscribe (END)
 
+	// private 
+	
 	private boolean subscribe (Subscription subscription) {
 		if (state == ConnectionState.CONNECTED) {
-			subscription.setClientId (clientId);
 			return send (subscription);
 		}
 		return false;
 	}
 
 	private boolean handshake () {
-		if (state == ConnectionState.DISCONNECTED && send (new com.atlas.websockets.Handshake ())) {
+		if (state == ConnectionState.DISCONNECTED && send (new Handshake ())) {
 			state = ConnectionState.CONNECTING;
 			return true;
 		}
@@ -192,27 +199,29 @@ public class Client {
 	}
 
 	private boolean preprocess (BayeuxMessage message) {
-		for (BayeuxExtension ext : extensions) {
-			if (!ext.incoming (message)) {
-				log.info (ext + " discarding in-message " + message);
-				return false;
+		synchronized (extensions) {
+			for (BayeuxExtension ext : extensions) {
+				if (!ext.incoming (message)) {
+					log.info (ext + " discarding in-message " + message);
+					return false;
+				}
 			}
 		}
 		return true;
 	}
 
 	private void process (BayeuxMessage message) {
-		if (message.getChannel ().equals (BayeuxMessageFactory.CHANNEL_MARKET)) {
+		if (message.getChannel ().equals (Channels.MARKET)) {
 			Book book = MessageFactory.book (message.getData ());
 			for (MarketDataListener l : marketListeners) {
 				l.handle (book);
 			}
-		} else if (message.getChannel ().equals (BayeuxMessageFactory.CHANNEL_LEVEL1)) {
+		} else if (message.getChannel ().equals (Channels.LEVEL1)) {
 			L1Update l1up = MessageFactory.level1 (message.getData ());
 			for (MarketDataListener l : marketListeners) {
 				l.handle (l1up);
 			}
-		} else if (message.getChannel ().equals (BayeuxMessageFactory.CHANNEL_TRADES)) {
+		} else if (message.getChannel ().equals (Channels.TRADES)) {
 			Trade trade = MessageFactory.trade (message.getData ());
 			for (MarketDataListener l : marketListeners) {
 				l.handle (trade);
@@ -227,11 +236,13 @@ public class Client {
 			log.error ("invalid session state");
 		} else {
 			// process extensions
-			for (BayeuxExtension ext : extensions) {
-//				if (!ext.outgoing (message)) {
-//					log.info (ext + " discarded " + message);
-//					return false;
-//				}
+			synchronized (extensions) {
+				for (BayeuxExtension ext : extensions) {
+					if (!ext.outgoing (message)) {
+						log.info (ext + " discarded " + message);
+						return false;
+					}
+				}
 			}
 			log.info (message.toString ());
 			Future<Void> fut = session.getRemote ().sendStringByFuture (message.toJSON ());
@@ -239,7 +250,19 @@ public class Client {
 		}
 		return false;
 	}
-
+	
+	private void setExtensions () {
+		// HMAC/SHA256 authentication
+		if (apiToken != null && apiSecret != null) {
+			BayeuxExtension ext = new BayeuxExtensionHMACAuthenticate (apiToken, apiSecret);
+			synchronized (extensions) {
+				BayeuxExtension defNoAuth = new BayeuxExtensionNoAuth ();
+				if (extensions.contains (defNoAuth)) extensions.remove (defNoAuth);
+				if (!extensions.contains (ext)) extensions.add (ext);
+			}
+		}
+	}
+	
 	// config/credentials
 	private String uri;
 	private String apiToken;
@@ -252,7 +275,6 @@ public class Client {
 	private Collection<BayeuxExtension> extensions;
 
 	private ConnectionState state;
-	private String clientId;
 
 	// keep track of our users
 	private Collection<AccountListener> accountListeners;

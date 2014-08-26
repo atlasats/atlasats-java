@@ -1,24 +1,29 @@
 package com.atlas.websockets;
 
-import org.json.JSONObject;
-
-
 public abstract class Subscription extends OutMessage {
 	
-	public abstract String getSubscriptionName ();
-	
-	@Override
-	public String toJSON () {
-		JSONObject json = new JSONObject ();
-		json.put ("channel", BayeuxMessageFactory.CHANNEL_SUBSCRIBE);
-		json.put (BayeuxMessageFactory.KEY_CLIENTID, getClientId ());
-		json.put ("subscription", getSubscriptionName ());
-		return json.toString ();
+	Subscription () {
+		super ();
+		addRoot (JSONKeys.SUBSCRIPTION, getSubscriptionName ());
 	}
 
 	@Override
+	public String getChannel () {
+		return Channels.SUBSCRIBE;
+	}
+	
+	@Override
+	public BayeuxMessageType getType () {
+		return BayeuxMessageType.SUBSCRIPTION;
+	}
+	
+	@Override
 	public String toString () {
 		return "out:subscription " + getSubscriptionName ();
+	}
+	
+	public boolean isPublic () {
+		return true;
 	}
 	
 	public static final Subscription LEVEL1 = new Subscription () {
@@ -32,51 +37,38 @@ public abstract class Subscription extends OutMessage {
 	public static final Subscription BOOK = new Subscription () {
 		public String getSubscriptionName () { return "/market"; }
 	};
+
+	protected abstract String getSubscriptionName ();
 }
 
 abstract class PrivateSubscription extends Subscription {
 	
-	public PrivateSubscription (String key, String secret) {
-		this.key = key;
-		this.secret = secret;
+	@Override
+	public boolean isPublic () {
+		return false;
 	}
-	
-	String key;
-	String secret;
 }
 
 class AccountSubscription extends PrivateSubscription {
 
-	public AccountSubscription (String key, String secret) {
-		super (key, secret);
-	}
-
 	@Override
-	public String getSubscriptionName () {
-		return "account";
+	protected String getSubscriptionName () {
+		return "/account";
 	}
 }
 
 class OrderSubscription extends PrivateSubscription {
 
-	public OrderSubscription (String key, String secret) {
-		super (key, secret);
-	}
-
 	@Override
-	public String getSubscriptionName () {
-		return "orders";
+	protected String getSubscriptionName () {
+		return "/orders";
 	}
 }
 
 class StatefulSubscription extends PrivateSubscription {
 
-	public StatefulSubscription (String key, String secret) {
-		super (key, secret);
-	}
-
 	@Override
-	public String getSubscriptionName () {
-		return "stateful";
+	protected String getSubscriptionName () {
+		return "/stateful";
 	}
 }

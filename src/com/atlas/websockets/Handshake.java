@@ -6,15 +6,22 @@ import org.json.JSONObject;
 
 class Handshake extends OutMessage {
 
-	@Override
-	public String toJSON () {
-		JSONObject json = new JSONObject ();
-		json.put ("channel", BayeuxMessageFactory.CHANNEL_HANDSHAKE);
-		json.put ("version", "1.0");
-		json.put ("supportedConnectionTypes", new JSONArray ().put ("websocket"));
-		return json.toString ();
+	Handshake () {
+		super ();
+		addRoot ("version", "1.0");
+		addRoot ("supportedConnectionTypes", new JSONArray ().put ("websocket"));
 	}
 
+	@Override
+	public String getChannel () {
+		return Channels.HANDSHAKE;
+	}
+
+	@Override
+	public BayeuxMessageType getType () {
+		return BayeuxMessageType.HANDSHAKE;
+	}
+	
 	@Override
 	public String toString () {
 		return "out:handshake";
