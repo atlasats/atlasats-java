@@ -44,6 +44,7 @@ public abstract class Subscription extends OutMessage {
 abstract class PrivateSubscription extends Subscription {
 	
 	public PrivateSubscription (int account) {
+		this.account = account;
 		subscriptionPrefix = "/account/" + account;
 	}
 	
@@ -52,12 +53,16 @@ abstract class PrivateSubscription extends Subscription {
 		return false;
 	}
 	
+	public int getAccount () {
+		return account;
+	}
+	
 	@Override
 	protected String getSubscriptionName() {
 		return subscriptionPrefix;
 	}
-	
-	
+
+	private int account;
 	private String subscriptionPrefix;
 }
 
@@ -93,6 +98,6 @@ class StatefulSubscription extends PrivateSubscription {
 	
 	@Override
 	protected String getSubscriptionName () {
-		return super.getSubscriptionName () + "/stateful";
+		return super.getSubscriptionName () + "/orders/stateful";
 	}
 }

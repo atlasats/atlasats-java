@@ -42,14 +42,6 @@ class BayeuxMessage {
 		this.clientId = clientId;
 	}
 
-	public String getSubscription () {
-		return subscription;
-	}
-
-	public void setSubscription (String subscription) {
-		this.subscription = subscription;
-	}
-
 	public String getError () {
 		return error;
 	}
@@ -67,7 +59,6 @@ class BayeuxMessage {
 	private String data;
 	private String clientId;
 	private String channel;
-	private String subscription;
 	private String error;
 	private BayeuxMessageType type;
 }

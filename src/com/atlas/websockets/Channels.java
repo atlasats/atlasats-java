@@ -1,8 +1,5 @@
 package com.atlas.websockets;
 
-import java.util.HashSet;
-
-
 class Channels {
 	
 	public static final String HANDSHAKE = "/meta/handshake";

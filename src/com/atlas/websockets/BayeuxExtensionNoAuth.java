@@ -17,6 +17,11 @@ public class BayeuxExtensionNoAuth implements BayeuxExtension {
 	}
 	
 	@Override
+	public String toString () {
+		return "no authentication check";
+	}
+	
+	@Override
 	public boolean equals (Object obj) {
 		return obj instanceof BayeuxExtensionNoAuth;
 	}

@@ -43,6 +43,11 @@ class BayeuxExtensionHMACAuthenticate implements BayeuxExtension {
 	    return false;
 	}
 	
+	@Override
+	public String toString () {
+		return "HMAC/SHA256";
+	}
+	
 	private JSONObject genExtObj (String signature, long nonce) {
 		JSONObject json = new JSONObject ();
 		json.put ("key", token);

@@ -21,6 +21,11 @@ public class BayeuxExtensionClientId implements BayeuxExtension {
 	}
 	
 	@Override
+	public String toString () {
+		return "client id check";
+	}
+	
+	@Override
 	public boolean equals (Object obj) {
 		return obj instanceof BayeuxExtensionClientId;
 	}

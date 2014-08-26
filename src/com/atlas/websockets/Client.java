@@ -36,6 +36,7 @@ public class Client {
 		state = ConnectionState.DISCONNECTED;
 		extensions = new LinkedList<BayeuxExtension> ();
 		extensions.add (new BayeuxExtensionNoAuth ());
+		extensions.add (new BayeuxExtensionAccountID ());
 		accountListeners = new LinkedList<AccountListener> ();
 		orderListeners = new LinkedList<OrderListener> ();
 		statefulListeners = new LinkedList<StatefulOrderListener> ();
@@ -94,7 +95,7 @@ public class Client {
 				}
 				break;
 			case SUBSCRIPTION:
-				log.info ("subscribed: " + message.getSubscription ());
+				log.info ("subscribed: " + message.get
 				break;
 			default:
 				process (message);
@@ -147,7 +148,7 @@ public class Client {
 	}
 
 	public boolean subscribe (AccountListener listener) {
-		if (subscribe (new AccountSubscription ())) {
+		if (subscribe (new AccountSubscription (account))) {
 			synchronized (accountListeners) {
 				if (!accountListeners.contains (listener)) {
 					accountListeners.add (listener);
@@ -159,7 +160,7 @@ public class Client {
 	}
 
 	public boolean subscribe (OrderListener listener) {
-		if (subscribe (new OrderSubscription ())) {
+		if (subscribe (new OrderSubscription (account))) {
 			synchronized (orderListeners) {
 				if (!orderListeners.contains (listener)) {
 					orderListeners.add (listener);
@@ -171,7 +172,7 @@ public class Client {
 	}
 
 	public boolean subscribe (StatefulOrderListener listener) {
-		if (subscribe (new StatefulSubscription ())) {
+		if (subscribe (new StatefulSubscription (account))) {
 			synchronized (statefulListeners) {
 				if (!statefulListeners.contains (listener)) {
 					statefulListeners.add (listener);
