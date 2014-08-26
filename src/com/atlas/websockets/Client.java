@@ -123,6 +123,10 @@ public class Client {
 		setExtensions ();
 	}
 
+	public void setAccountNumber (int accountNumber) {
+		this.account = accountNumber;
+	}
+	
 	// Configuration (END)
 
 	// Subscribe
@@ -267,7 +271,8 @@ public class Client {
 	private String uri;
 	private String apiToken;
 	private String apiSecret;
-
+	private int	account;
+	
 	private WebSocketClient jettyWSClient;
 
 	private final CountDownLatch closeLatch;

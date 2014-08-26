@@ -43,32 +43,56 @@ public abstract class Subscription extends OutMessage {
 
 abstract class PrivateSubscription extends Subscription {
 	
+	public PrivateSubscription (int account) {
+		subscriptionPrefix = "/account/" + account;
+	}
+	
 	@Override
 	public boolean isPublic () {
 		return false;
 	}
+	
+	@Override
+	protected String getSubscriptionName() {
+		return subscriptionPrefix;
+	}
+	
+	
+	private String subscriptionPrefix;
 }
 
 class AccountSubscription extends PrivateSubscription {
 
+	public AccountSubscription (int account) {
+		super (account);
+	}
+	
 	@Override
 	protected String getSubscriptionName () {
-		return "/account";
+		return super.getSubscriptionName () + "/info";
 	}
 }
 
 class OrderSubscription extends PrivateSubscription {
 
+	public OrderSubscription (int account) {
+		super (account);
+	}
+	
 	@Override
 	protected String getSubscriptionName () {
-		return "/orders";
+		return super.getSubscriptionName () + "/orders";
 	}
 }
 
 class StatefulSubscription extends PrivateSubscription {
 
+	public StatefulSubscription (int account) {
+		super (account);
+	}
+	
 	@Override
 	protected String getSubscriptionName () {
-		return "/stateful";
+		return super.getSubscriptionName () + "/stateful";
 	}
 }
