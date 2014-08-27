@@ -3,9 +3,7 @@ package com.atlas.websockets;
 import java.net.URI;
 import java.util.Collection;
 import java.util.LinkedList;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
@@ -16,15 +14,6 @@ import org.eclipse.jetty.websocket.client.WebSocketClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.atlas.account.AccountListener;
-import com.atlas.common.AtlasAPIException;
-import com.atlas.marketdata.Book;
-import com.atlas.marketdata.L1Update;
-import com.atlas.marketdata.MarketDataListener;
-import com.atlas.marketdata.MessageFactory;
-import com.atlas.marketdata.Trade;
-import com.atlas.orders.OrderListener;
-import com.atlas.orders.stateful.StatefulOrderListener;
 
 @WebSocket
 public class Client {
@@ -32,7 +21,6 @@ public class Client {
 	public Client () {
 		log = LoggerFactory.getLogger (getClass ());
 		jettyWSClient = new WebSocketClient ();
-		closeLatch = new CountDownLatch (1);
 		state = ConnectionState.DISCONNECTED;
 		extensions = new LinkedList<BayeuxExtension> ();
 		extensions.add (new BayeuxExtensionNoAuth ());
@@ -55,10 +43,6 @@ public class Client {
 		}
 	}
 
-	public boolean awaitClose (int duration, TimeUnit unit) throws InterruptedException {
-		return closeLatch.await (duration, unit);
-	}
-
 	// @WebSocket
 
 	@OnWebSocketClose
@@ -66,7 +50,6 @@ public class Client {
 		log.info ("connection closed: " + reason);
 		session = null;
 		state = ConnectionState.DISCONNECTED;
-		closeLatch.countDown ();
 	}
 
 	@OnWebSocketConnect
@@ -217,19 +200,28 @@ public class Client {
 
 	private void process (BayeuxMessage message) {
 		if (message.getChannel ().equals (Channels.MARKET)) {
-			Book book = MessageFactory.book (message.getData ());
 			for (MarketDataListener l : marketListeners) {
-				l.handle (book);
+				l.book (message.getData ());
 			}
 		} else if (message.getChannel ().equals (Channels.LEVEL1)) {
-			L1Update l1up = MessageFactory.level1 (message.getData ());
 			for (MarketDataListener l : marketListeners) {
-				l.handle (l1up);
+				l.level1 (message.getData ());
 			}
 		} else if (message.getChannel ().equals (Channels.TRADES)) {
-			Trade trade = MessageFactory.trade (message.getData ());
 			for (MarketDataListener l : marketListeners) {
-				l.handle (trade);
+				l.trade (message.getData ());
+			}
+		} else if (message.getChannel ().equals (Channels.ACCOUNT)) {
+			for (AccountListener l : accountListeners) {
+				l.update (message.getData ());
+			}
+		} else if (message.getChannel ().equals (Channels.ORDERS)) {
+			for (OrderListener l : orderListeners) {
+				l.update (message.getData ());
+			}
+		} else if (message.getChannel ().equals (Channels.STATEFUL)) {
+			for (StatefulOrderListener l : statefulListeners) {
+				
 			}
 		}
 	}
@@ -269,14 +261,13 @@ public class Client {
 	}
 	
 	// config/credentials
+	private int	account;
 	private String uri;
 	private String apiToken;
 	private String apiSecret;
-	private int	account;
 	
 	private WebSocketClient jettyWSClient;
 
-	private final CountDownLatch closeLatch;
 	private Session session;
 	private Collection<BayeuxExtension> extensions;
 

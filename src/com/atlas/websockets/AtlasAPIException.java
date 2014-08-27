@@ -1,4 +1,4 @@
-package com.atlas.common;
+package com.atlas.websockets;
 
 
 public final class AtlasAPIException extends RuntimeException {
