@@ -81,7 +81,7 @@ public class Client {
 		Collection<BayeuxMessage> messages = BayeuxMessageFactory.create (jsonString);
 		for (BayeuxMessage message : messages) {
 			if (!preprocess (message)) continue;
-			log.debug ("processing in-message: " + message);
+			log.debug ("processing in-message: " + message.getData ());
 			switch (message.getType ()) {
 			case ERROR:
 				log.info ("error: " + message.getError ());

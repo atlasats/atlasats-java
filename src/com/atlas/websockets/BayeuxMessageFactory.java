@@ -37,6 +37,7 @@ public class BayeuxMessageFactory {
 			return message;
 		}
 		String channel = json.getString (JSONKeys.CHANNEL);
+		message.setChannel (channel);
 		if (channel.equals (Channels.HANDSHAKE)) {
 			message.setType (BayeuxMessageType.HANDSHAKE);
 			message.setClientId (json.getString (JSONKeys.CLIENTID));
@@ -46,7 +47,6 @@ public class BayeuxMessageFactory {
 		} else {
 			message.setType (BayeuxMessageType.DATA);
 			message.setData (json.getString (JSONKeys.DATA));
-			message.setChannel (channel);
 		}
 		return message;
 	}
