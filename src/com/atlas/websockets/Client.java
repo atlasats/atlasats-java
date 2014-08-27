@@ -113,7 +113,7 @@ public class Client {
 	
 	// Configuration (END)
 
-	// Subscribe
+	// Business
 
 	public boolean subscribe (MarketDataListener listener, Collection<Subscription> subscriptions) {
 		boolean success = true;
@@ -166,7 +166,24 @@ public class Client {
 		return false;
 	}
 
-	// Subscribe (END)
+	public boolean place (Order order) {
+		if (!order.validate ()) {
+			lastError = order.getError ();
+			return false;
+		}
+		order.setAccount (account);
+		return send (order);
+	}
+	
+	public boolean cancel (String orderId) {
+		return true;
+	}
+	
+	public String getLastError () {
+		return lastError;
+	}
+	
+	// Business (END)
 
 	// private 
 	
@@ -265,6 +282,8 @@ public class Client {
 	private String uri;
 	private String apiToken;
 	private String apiSecret;
+	
+	private String lastError;
 	
 	private WebSocketClient jettyWSClient;
 

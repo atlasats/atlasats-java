@@ -1,15 +1,17 @@
 package com.atlas.websockets;
 
-class BayeuxMessage {
+abstract class BayeuxMessage {
 
-	public BayeuxMessageType getType () {
-		return type;
+	abstract BayeuxMessageType getType ();
+
+	boolean isPublic () {
+		return true;
 	}
-
-	public void setType (BayeuxMessageType type) {
-		this.type = type;
+	
+	int getAccount () {
+		return 0;
 	}
-
+	
 	public String getRaw () {
 		return raw;
 	}
@@ -52,7 +54,7 @@ class BayeuxMessage {
 	
 	@Override
 	public String toString () {
-		return "bayeux:" + type;
+		return "bayeux:" + getType ();
 	}
 
 	private String raw;
@@ -60,5 +62,37 @@ class BayeuxMessage {
 	private String clientId;
 	private String channel;
 	private String error;
+}
+
+class InMessage extends BayeuxMessage {
+
+	@Override
+	BayeuxMessageType getType () {
+		return type;
+	}
+	
+	void setType (BayeuxMessageType type) {
+		this.type = type;
+	}
+
 	private BayeuxMessageType type;
+}
+
+abstract class PrivateMessage extends BayeuxMessage {
+
+	@Override
+	boolean isPublic () {
+		return false;
+	}
+	
+	void setAccount (int account) {
+		this.account = account;
+	}
+	
+	@Override
+	int getAccount () {
+		return account;
+	}
+	
+	private int account;
 }

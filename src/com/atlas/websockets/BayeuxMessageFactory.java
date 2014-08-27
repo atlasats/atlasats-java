@@ -30,7 +30,7 @@ public class BayeuxMessageFactory {
 
 	
 	private static BayeuxMessage parse (JSONObject json) {
-		BayeuxMessage message = new BayeuxMessage ();
+		InMessage message = new InMessage ();
 		if (json.has (JSONKeys.ERROR)) {
 			message.setType (BayeuxMessageType.ERROR);
 			message.setError (json.getString (JSONKeys.ERROR));

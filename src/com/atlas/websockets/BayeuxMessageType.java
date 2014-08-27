@@ -6,5 +6,7 @@ public enum BayeuxMessageType {
 	HANDSHAKE,
 	ERROR,
 	SUBSCRIPTION,
+	ORDER,
+	CANCEL,
 	DATA
 }

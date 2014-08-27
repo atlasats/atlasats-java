@@ -62,7 +62,8 @@ abstract class PrivateSubscription extends Subscription {
 		return false;
 	}
 	
-	public int getAccount () {
+	@Override
+	int getAccount () {
 		return account;
 	}
 	
