@@ -1,8 +1,9 @@
 package com.atlas.websockets;
 
 import java.io.UnsupportedEncodingException;
+import java.security.Key;
 
-import javax.crypto.Cipher;
+import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.DatatypeConverter;
 
@@ -27,14 +28,14 @@ class BayeuxExtensionHMACAuthenticate implements BayeuxExtension {
 
 	@Override
 	public boolean outgoing (OutMessage message) {
+		if (message.getType () == BayeuxMessageType.HANDSHAKE) return true; 
 		long nonce = System.currentTimeMillis ();
 		byte[] input = genSigInput (message, nonce);
-		SecretKeySpec secretKeySpec = new SecretKeySpec (input, "HmacSHA256");
+		Key secretKeySpec = new SecretKeySpec (string2Bytes (secret, "UTF-8"), "HmacSHA256");
 		try {
-		    Cipher cipher = Cipher.getInstance ("HmacSHA256");
-		    cipher.init (Cipher.ENCRYPT_MODE, secretKeySpec);
-		    byte[] encrypted = cipher.doFinal (secret.getBytes());
-		    String signature = DatatypeConverter.printHexBinary (encrypted);
+			Mac mac = Mac.getInstance ("HmacSHA256");
+			mac.init (secretKeySpec);
+		    String signature = DatatypeConverter.printHexBinary (mac.doFinal (input));
 		    message.addExtension ("ident", genExtObj (signature, nonce));
 		    return true;
 		} catch (Exception e) {
@@ -51,7 +52,7 @@ class BayeuxExtensionHMACAuthenticate implements BayeuxExtension {
 	private JSONObject genExtObj (String signature, long nonce) {
 		JSONObject json = new JSONObject ();
 		json.put ("key", token);
-		json.put ("signature", signature);
+		json.put ("signature", signature.toLowerCase ());
 		json.put ("nounce", nonce);
 		return json;
 	}
@@ -66,10 +67,16 @@ class BayeuxExtensionHMACAuthenticate implements BayeuxExtension {
 		sb.append (Long.toString (nonce));
 		sb.append (':');
 		sb.append (message.getChannel ());
+//		sb.append (((Subscription) message).getSubscriptionName ());
 		sb.append (':');
 		sb.append (message.getData ());
+		System.out.println (sb.toString ());
+		return string2Bytes (sb.toString (), "ASCII");
+	}
+	
+	private byte[] string2Bytes (String data, String encoding) {
 		try {
-			return sb.toString ().getBytes ("ASCII");
+			return data.getBytes (encoding);
 		} catch (UnsupportedEncodingException e) {
 			return null;
 		}

@@ -7,7 +7,6 @@ abstract class OutMessage extends BayeuxMessage {
 	
 	OutMessage () {
 		json = new JSONObject ();
-		json.put (JSONKeys.CHANNEL, getChannel ());
 		setData ("");
 	}
 	
@@ -24,6 +23,7 @@ abstract class OutMessage extends BayeuxMessage {
 	}
 	
 	public String toJSON () {
+		json.put (JSONKeys.CHANNEL, getChannel ());
 		json.put (JSONKeys.CLIENTID, getClientId ());
 		json.put (JSONKeys.DATA, getData ());
 		return json.toString ();

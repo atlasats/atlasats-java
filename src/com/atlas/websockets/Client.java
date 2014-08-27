@@ -249,7 +249,7 @@ public class Client {
 					}
 				}
 			}
-			log.info (message.toString ());
+			log.info ("sending: " + message.toJSON ());
 			Future<Void> fut = session.getRemote ().sendStringByFuture (message.toJSON ());
 			return true;
 		}

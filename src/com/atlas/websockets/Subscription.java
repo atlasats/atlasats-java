@@ -9,7 +9,6 @@ public abstract class Subscription extends OutMessage {
 	
 	Subscription () {
 		super ();
-		addRoot (JSONKeys.SUBSCRIPTION, getSubscriptionName ());
 	}
 
 	@Override
@@ -25,6 +24,12 @@ public abstract class Subscription extends OutMessage {
 	@Override
 	public String toString () {
 		return "out:subscription " + getSubscriptionName ();
+	}
+	
+	@Override
+	public String toJSON () {
+		addRoot (JSONKeys.SUBSCRIPTION, getSubscriptionName ());
+		return super.toJSON ();
 	}
 	
 	public boolean isPublic () {
@@ -50,7 +55,6 @@ abstract class PrivateSubscription extends Subscription {
 	
 	public PrivateSubscription (int account) {
 		this.account = account;
-		subscriptionPrefix = "/account/" + account;
 	}
 	
 	@Override
@@ -64,11 +68,10 @@ abstract class PrivateSubscription extends Subscription {
 	
 	@Override
 	protected String getSubscriptionName() {
-		return subscriptionPrefix;
+		return "/account/" + account;
 	}
 
 	private int account;
-	private String subscriptionPrefix;
 }
 
 class AccountSubscription extends PrivateSubscription {
