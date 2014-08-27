@@ -29,6 +29,7 @@ public class Client {
 		orderListeners = new LinkedList<OrderListener> ();
 		statefulListeners = new LinkedList<StatefulOrderListener> ();
 		marketListeners = new LinkedList<MarketDataListener> ();
+		currency = "USD";
 	}
 
 	public void connect () {
@@ -64,7 +65,7 @@ public class Client {
 		Collection<BayeuxMessage> messages = BayeuxMessageFactory.create (jsonString);
 		for (BayeuxMessage message : messages) {
 			if (!preprocess (message)) continue;
-			log.debug ("processing in-message: " + message.getData ());
+			log.debug ("processing in-message: " + (message.getData () == null ? message.getType () : message.getData ()));
 			switch (message.getType ()) {
 			case ERROR:
 				log.info ("error: " + message.getError ());
@@ -109,6 +110,10 @@ public class Client {
 
 	public void setAccountNumber (int accountNumber) {
 		this.account = accountNumber;
+	}
+	
+	public void setCurrency (String currency) {
+		this.currency = currency;
 	}
 	
 	// Configuration (END)
@@ -167,11 +172,13 @@ public class Client {
 	}
 
 	public boolean place (Order order) {
+		order.setAccount (account);
+		order.setCurrency (currency);
+		order.prepare ();
 		if (!order.validate ()) {
 			lastError = order.getError ();
 			return false;
 		}
-		order.setAccount (account);
 		return send (order);
 	}
 	
@@ -232,13 +239,12 @@ public class Client {
 			for (AccountListener l : accountListeners) {
 				l.update (message.getData ());
 			}
-		} else if (message.getChannel ().equals (Channels.ORDERS)) {
+		} else if (message.getChannel ().endsWith (Channels.ORDERS)) {
 			for (OrderListener l : orderListeners) {
 				l.update (message.getData ());
 			}
-		} else if (message.getChannel ().equals (Channels.STATEFUL)) {
+		} else if (message.getChannel ().endsWith (Channels.STATEFUL)) {
 			for (StatefulOrderListener l : statefulListeners) {
-				
 			}
 		}
 	}
@@ -258,8 +264,9 @@ public class Client {
 					}
 				}
 			}
-			log.info ("sending: " + message.toJSON ());
-			Future<Void> fut = session.getRemote ().sendStringByFuture (message.toJSON ());
+			String json = message.toJSON ();
+			log.info ("sending: " + json);
+			Future<Void> fut = session.getRemote ().sendStringByFuture (json);
 			return true;
 		}
 		return false;
@@ -279,6 +286,7 @@ public class Client {
 	
 	// config/credentials
 	private int	account;
+	private String currency;
 	private String uri;
 	private String apiToken;
 	private String apiSecret;

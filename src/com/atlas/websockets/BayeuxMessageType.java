@@ -8,5 +8,6 @@ public enum BayeuxMessageType {
 	SUBSCRIPTION,
 	ORDER,
 	CANCEL,
+	ECHO,
 	DATA
 }

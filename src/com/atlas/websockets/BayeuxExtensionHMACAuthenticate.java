@@ -67,10 +67,9 @@ class BayeuxExtensionHMACAuthenticate implements BayeuxExtension {
 		sb.append (Long.toString (nonce));
 		sb.append (':');
 		sb.append (message.getChannel ());
-//		sb.append (((Subscription) message).getSubscriptionName ());
 		sb.append (':');
 		sb.append (message.getData ());
-		System.out.println (sb.toString ());
+		log.debug ("sig input: " + sb.toString ());
 		return string2Bytes (sb.toString (), "ASCII");
 	}
 	

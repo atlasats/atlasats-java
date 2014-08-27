@@ -12,14 +12,10 @@ public class Order extends OutMessage {
 	public BayeuxMessageType getType () {
 		return BayeuxMessageType.ORDER;
 	}
-	
+
 	@Override
-	public String toJSON () {
-		JSONObject data = new JSONObject ();
-		data.put (JSONKeys.ACCOUNT, account);
-		data.put (JSONKeys.CLID, clientOrderId);
-		addRoot (JSONKeys.DATA, data);
-		return super.toJSON ();
+	public String getChannel () {
+		return Channels.ACTIONS;
 	}
 	
 	public String getSymbol () {
@@ -82,6 +78,25 @@ public class Order extends OutMessage {
 		this.account = account;
 	}
 
+	void setCurrency (String currency) {
+		this.currency = currency;
+	}
+	
+	void prepare () {
+		JSONObject data = new JSONObject ();
+		data.put (JSONKeys.ACCOUNT, account);
+		data.put (JSONKeys.CLID, clientOrderId);
+		data.put (JSONKeys.ACTION, "order:create");
+		data.put (JSONKeys.ITEM, symbol);
+		data.put (JSONKeys.CURRENCY, currency);
+		data.put (JSONKeys.SIDE, side.toString ());
+		data.put (JSONKeys.QUANTITY, quantity);
+		data.put (JSONKeys.ORDER_TYPE, orderType.toString ().toLowerCase ());
+		data.put (JSONKeys.PRICE, limit);
+		data.put (JSONKeys.DISPLAY, display);
+		setData (data.toString ());
+	}
+	
 	boolean validate () {
 		if (symbol == null) {
 			setError ("Invalid symbol");
@@ -119,6 +134,10 @@ public class Order extends OutMessage {
 			setError ("Market orders should not have values for limit or display");
 			return false;
 		}
+		if (currency == null) {
+			setError ("Invalid currency: " + currency);
+			return false;
+		}
 		return true;
 	}
 
@@ -129,6 +148,7 @@ public class Order extends OutMessage {
 	private double limit;
 	private OrderType orderType;
 	private String clientOrderId;
+	private String currency;
 	
 	// internal
 	private int account;

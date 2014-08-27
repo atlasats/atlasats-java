@@ -44,6 +44,9 @@ public class BayeuxMessageFactory {
 		} else if (channel.equals (Channels.SUBSCRIBE)) {
 			message.setType (BayeuxMessageType.SUBSCRIPTION);
 			message.setData (json.getString (JSONKeys.SUBSCRIPTION));
+		} else if (channel.equals (Channels.ACTIONS)) {
+			message.setType (BayeuxMessageType.ECHO);
+			message.setData (json.getBoolean (JSONKeys.SUCCESSFUL) ? "success" : "failure");
 		} else {
 			message.setType (BayeuxMessageType.DATA);
 			message.setData (json.getString (JSONKeys.DATA));

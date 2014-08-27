@@ -10,4 +10,5 @@ class Channels {
 	public static final String ACCOUNT = "/info";
 	public static final String ORDERS = "/orders";
 	public static final String STATEFUL = "/orders/stateful";
+	public static final String ACTIONS = "/actions";
 }
