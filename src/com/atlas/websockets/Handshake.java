@@ -1,7 +1,6 @@
 package com.atlas.websockets;
 
 import org.json.JSONArray;
-import org.json.JSONObject;
 
 
 class Handshake extends OutMessage {

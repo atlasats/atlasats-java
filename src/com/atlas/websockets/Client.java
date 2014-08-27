@@ -95,7 +95,7 @@ public class Client {
 				}
 				break;
 			case SUBSCRIPTION:
-				log.info ("subscribed: " + message.get
+				log.info ("subscribed: " + message.getData ());
 				break;
 			default:
 				process (message);

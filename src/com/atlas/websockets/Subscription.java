@@ -1,5 +1,10 @@
 package com.atlas.websockets;
 
+/**
+ * Message sent to the server through the '/meta/subscribe' channel to subscribe to a channel
+ * @author ken
+ *
+ */
 public abstract class Subscription extends OutMessage {
 	
 	Subscription () {
@@ -27,15 +32,15 @@ public abstract class Subscription extends OutMessage {
 	}
 	
 	public static final Subscription LEVEL1 = new Subscription () {
-		public String getSubscriptionName () { return "/level1"; }
+		public String getSubscriptionName () { return Channels.LEVEL1; }
 	};
 	
 	public static final Subscription TRADES = new Subscription () {
-		public String getSubscriptionName () { return "/trades"; }
+		public String getSubscriptionName () { return Channels.TRADES; }
 	};
 	
 	public static final Subscription BOOK = new Subscription () {
-		public String getSubscriptionName () { return "/market"; }
+		public String getSubscriptionName () { return Channels.MARKET; }
 	};
 
 	protected abstract String getSubscriptionName ();
@@ -74,7 +79,7 @@ class AccountSubscription extends PrivateSubscription {
 	
 	@Override
 	protected String getSubscriptionName () {
-		return super.getSubscriptionName () + "/info";
+		return super.getSubscriptionName () + Channels.ACCOUNT;
 	}
 }
 
@@ -86,7 +91,7 @@ class OrderSubscription extends PrivateSubscription {
 	
 	@Override
 	protected String getSubscriptionName () {
-		return super.getSubscriptionName () + "/orders";
+		return super.getSubscriptionName () + Channels.ORDERS;
 	}
 }
 
@@ -98,6 +103,6 @@ class StatefulSubscription extends PrivateSubscription {
 	
 	@Override
 	protected String getSubscriptionName () {
-		return super.getSubscriptionName () + "/orders/stateful";
+		return super.getSubscriptionName () + Channels.STATEFUL;
 	}
 }

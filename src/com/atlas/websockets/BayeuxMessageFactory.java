@@ -42,7 +42,7 @@ public class BayeuxMessageFactory {
 			message.setClientId (json.getString (JSONKeys.CLIENTID));
 		} else if (channel.equals (Channels.SUBSCRIBE)) {
 			message.setType (BayeuxMessageType.SUBSCRIPTION);
-			message.setSubscription (json.getString (JSONKeys.SUBSCRIPTION));
+			message.setData (json.getString (JSONKeys.SUBSCRIPTION));
 		} else {
 			message.setType (BayeuxMessageType.DATA);
 			message.setData (json.getString (JSONKeys.DATA));

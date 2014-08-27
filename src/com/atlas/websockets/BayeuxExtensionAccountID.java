@@ -14,7 +14,7 @@ public class BayeuxExtensionAccountID implements BayeuxExtension {
 		if (message instanceof PrivateSubscription) {
 			return ((PrivateSubscription) message).getAccount () > 0;
 		}
-		return false;
+		return true;
 	}
 	
 	@Override
