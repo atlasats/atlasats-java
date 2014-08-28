@@ -183,7 +183,10 @@ public class Client {
 	}
 	
 	public boolean cancel (String orderId) {
-		return true;
+		Cancel cxl = new Cancel ();
+		cxl.setOrderId (orderId);
+		cxl.prepare ();
+		return send (cxl);
 	}
 	
 	public String getLastError () {

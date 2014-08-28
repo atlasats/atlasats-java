@@ -19,4 +19,5 @@ public class JSONKeys {
 	public static final String ORDER_TYPE = "type";
 	public static final String DISPLAY = "display";
 	public static final String SUCCESSFUL = "successful";
+	public static final String ORDER_ID = "oid";
 }
