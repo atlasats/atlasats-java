@@ -1,6 +1,6 @@
 package com.atlas.websockets;
 
-public class BayeuxExtensionAccountID implements BayeuxExtension {
+class BayeuxExtensionAccountID implements BayeuxExtension {
 
 	@Override
 	public boolean incoming (BayeuxMessage message) {

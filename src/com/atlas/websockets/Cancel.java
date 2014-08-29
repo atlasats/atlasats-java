@@ -8,7 +8,7 @@ class Cancel extends OutMessage {
 	public BayeuxMessageType getType () {
 		return BayeuxMessageType.CANCEL;
 	}
-	
+
 	@Override
 	public String getChannel () {
 		return Channels.ACTIONS;
@@ -28,6 +28,6 @@ class Cancel extends OutMessage {
 		data.put (JSONKeys.ORDER_ID, orderId);
 		setData (data.toString ());
 	}
-	
+
 	private String orderId;
 }

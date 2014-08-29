@@ -1,6 +1,6 @@
 package com.atlas.websockets;
 
-public class JSONKeys {
+class JSONKeys {
 
 	public static final String CHANNEL = "channel";
 	public static final String CLIENTID = "clientId";

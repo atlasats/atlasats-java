@@ -1,4 +1,4 @@
-package com.atlas.websockets;
+package com.atlas.api;
 
 public interface AccountListener {
 

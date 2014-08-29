@@ -1,13 +1,6 @@
 package com.atlas.websockets;
 
+enum BayeuxMessageType {
 
-public enum BayeuxMessageType {
-
-	HANDSHAKE,
-	ERROR,
-	SUBSCRIPTION,
-	ORDER,
-	CANCEL,
-	ECHO,
-	DATA
+	HANDSHAKE, ERROR, SUBSCRIPTION, ORDER, CANCEL, ECHO, DATA
 }

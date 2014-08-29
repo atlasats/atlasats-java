@@ -6,7 +6,8 @@ import java.util.LinkedList;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class BayeuxMessageFactory {
+
+class BayeuxMessageFactory {
 
 	public static Collection<BayeuxMessage> create (String jsonString) {
 		Collection<BayeuxMessage> messages = new LinkedList<BayeuxMessage> ();

@@ -11,15 +11,14 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 class BayeuxExtensionHMACAuthenticate implements BayeuxExtension {
 
 	public BayeuxExtensionHMACAuthenticate (String token, String secret) {
 		this.token = token;
 		this.secret = secret;
-		log = LoggerFactory.getLogger (getClass());
+		log = LoggerFactory.getLogger (getClass ());
 	}
-	
+
 	@Override
 	public boolean incoming (BayeuxMessage message) {
 		// nothing to do on incoming messages
@@ -28,27 +27,27 @@ class BayeuxExtensionHMACAuthenticate implements BayeuxExtension {
 
 	@Override
 	public boolean outgoing (OutMessage message) {
-		if (message.getType () == BayeuxMessageType.HANDSHAKE) return true; 
+		if (message.getType () == BayeuxMessageType.HANDSHAKE) return true;
 		long nonce = System.currentTimeMillis ();
 		byte[] input = genSigInput (message, nonce);
 		Key secretKeySpec = new SecretKeySpec (string2Bytes (secret, "UTF-8"), "HmacSHA256");
 		try {
 			Mac mac = Mac.getInstance ("HmacSHA256");
 			mac.init (secretKeySpec);
-		    String signature = DatatypeConverter.printHexBinary (mac.doFinal (input));
-		    message.addExtension ("ident", genExtObj (signature, nonce));
-		    return true;
+			String signature = DatatypeConverter.printHexBinary (mac.doFinal (input));
+			message.addExtension ("ident", genExtObj (signature, nonce));
+			return true;
 		} catch (Exception e) {
 			log.error ("encrypting out-message", e);
 		}
-	    return false;
+		return false;
 	}
-	
+
 	@Override
 	public String toString () {
 		return "HMAC/SHA256";
 	}
-	
+
 	private JSONObject genExtObj (String signature, long nonce) {
 		JSONObject json = new JSONObject ();
 		json.put ("key", token);
@@ -56,8 +55,10 @@ class BayeuxExtensionHMACAuthenticate implements BayeuxExtension {
 		json.put ("nounce", nonce);
 		return json;
 	}
+
 	/**
 	 * <token>:<nonce>:<channel>:<data>
+	 * 
 	 * @return
 	 */
 	private byte[] genSigInput (OutMessage message, long nonce) {
@@ -72,7 +73,7 @@ class BayeuxExtensionHMACAuthenticate implements BayeuxExtension {
 		log.debug ("sig input: " + sb.toString ());
 		return string2Bytes (sb.toString (), "ASCII");
 	}
-	
+
 	private byte[] string2Bytes (String data, String encoding) {
 		try {
 			return data.getBytes (encoding);
@@ -80,7 +81,7 @@ class BayeuxExtensionHMACAuthenticate implements BayeuxExtension {
 			return null;
 		}
 	}
-	
+
 	private String token;
 	private String secret;
 

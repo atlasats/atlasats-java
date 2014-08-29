@@ -3,6 +3,7 @@ package com.atlas.websockets;
 import org.json.JSONArray;
 
 
+
 class Handshake extends OutMessage {
 
 	Handshake () {

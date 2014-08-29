@@ -1,7 +1,7 @@
 package com.atlas.websockets;
 
 
-public enum ConnectionState {
+enum ConnectionState {
 
 	CONNECTED,
 	CONNECTING,

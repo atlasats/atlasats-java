@@ -14,9 +14,16 @@ import org.eclipse.jetty.websocket.client.WebSocketClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.atlas.api.AccountListener;
+import com.atlas.api.AtlasClient;
+import com.atlas.api.MarketDataListener;
+import com.atlas.api.OrderListener;
+import com.atlas.api.StatefulOrderListener;
+import com.atlas.types.AtlasAPIException;
+
 
 @WebSocket
-public class Client {
+class Client implements AtlasClient {
 
 	public Client () {
 		log = LoggerFactory.getLogger (getClass ());
@@ -171,15 +178,15 @@ public class Client {
 		return false;
 	}
 
-	public boolean place (Order order) {
-		order.setAccount (account);
-		order.setCurrency (currency);
-		order.prepare ();
+	public boolean place (com.atlas.api.OrderParameters order) {
+		Order o = new Order (order);
+		o.setAccount (account);
+		o.setCurrency (currency);
+		o.prepare ();
 		if (!order.validate ()) {
-			lastError = order.getError ();
 			return false;
 		}
-		return send (order);
+		return send (o);
 	}
 	
 	public boolean cancel (String orderId) {
@@ -187,10 +194,6 @@ public class Client {
 		cxl.setOrderId (orderId);
 		cxl.prepare ();
 		return send (cxl);
-	}
-	
-	public String getLastError () {
-		return lastError;
 	}
 	
 	// Business (END)
@@ -248,6 +251,7 @@ public class Client {
 			}
 		} else if (message.getChannel ().endsWith (Channels.STATEFUL)) {
 			for (StatefulOrderListener l : statefulListeners) {
+				System.out.println (message.getData ());
 			}
 		}
 	}
@@ -293,8 +297,6 @@ public class Client {
 	private String uri;
 	private String apiToken;
 	private String apiSecret;
-	
-	private String lastError;
 	
 	private WebSocketClient jettyWSClient;
 

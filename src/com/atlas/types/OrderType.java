@@ -1,4 +1,4 @@
-package com.atlas.websockets;
+package com.atlas.types;
 
 
 public enum OrderType {

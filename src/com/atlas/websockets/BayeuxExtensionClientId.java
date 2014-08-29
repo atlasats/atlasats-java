@@ -1,7 +1,6 @@
 package com.atlas.websockets;
 
-
-public class BayeuxExtensionClientId implements BayeuxExtension {
+class BayeuxExtensionClientId implements BayeuxExtension {
 
 	BayeuxExtensionClientId (String clientId) {
 		this.clientId = clientId;
@@ -19,12 +18,12 @@ public class BayeuxExtensionClientId implements BayeuxExtension {
 		}
 		return true;
 	}
-	
+
 	@Override
 	public String toString () {
 		return "client id check";
 	}
-	
+
 	@Override
 	public boolean equals (Object obj) {
 		return obj instanceof BayeuxExtensionClientId;
@@ -34,6 +33,6 @@ public class BayeuxExtensionClientId implements BayeuxExtension {
 	public int hashCode () {
 		return getClass ().hashCode ();
 	}
-	
+
 	private String clientId;
 }

@@ -2,10 +2,18 @@ package com.atlas.websockets;
 
 import org.json.JSONObject;
 
-public class Order extends OutMessage {
+import com.atlas.api.OrderParameters;
+import com.atlas.types.OrderType;
+import com.atlas.types.Side;
+import com.atlas.websockets.BayeuxMessageType;
+import com.atlas.websockets.Channels;
+import com.atlas.websockets.JSONKeys;
+import com.atlas.websockets.OutMessage;
 
-	public Order () {
-		orderType = OrderType.LIMIT;
+class Order extends OutMessage {
+
+	public Order (OrderParameters order) {
+		this.params = order;
 	}
 
 	@Override
@@ -19,61 +27,33 @@ public class Order extends OutMessage {
 	}
 	
 	public String getSymbol () {
-		return symbol;
-	}
-
-	public void setSymbol (String symbol) {
-		this.symbol = symbol;
+		return params.getSymbol ();
 	}
 
 	public Side getSide () {
-		return side;
-	}
-
-	public void setSide (Side side) {
-		this.side = side;
+		return params.getSide ();
 	}
 
 	public double getQuantity () {
-		return quantity;
-	}
-
-	public void setQuantity (double quantity) {
-		this.quantity = quantity;
+		return params.getQuantity ();
 	}
 
 	public double getDisplay () {
-		return display;
-	}
-
-	public void setDisplay (double display) {
-		this.display = display;
+		return params.getDisplay ();
 	}
 
 	public double getLimit () {
-		return limit;
-	}
-
-	public void setLimit (double limit) {
-		this.limit = limit;
+		return params.getLimit ();
 	}
 
 	public OrderType getOrderType () {
-		return orderType;
-	}
-
-	public void setOrderType (OrderType orderType) {
-		this.orderType = orderType;
+		return params.getOrderType ();
 	}
 
 	public String getClientOrderId () {
-		return clientOrderId;
+		return params.getClientOrderId ();
 	}
 
-	public void setClientOrderId (String clientOrderId) {
-		this.clientOrderId = clientOrderId;
-	}
-	
 	void setAccount (int account) {
 		this.account = account;
 	}
@@ -85,71 +65,21 @@ public class Order extends OutMessage {
 	void prepare () {
 		JSONObject data = new JSONObject ();
 		data.put (JSONKeys.ACCOUNT, account);
-		data.put (JSONKeys.CLID, clientOrderId);
+		data.put (JSONKeys.CLID, getClientOrderId ());
 		data.put (JSONKeys.ACTION, "order:create");
-		data.put (JSONKeys.ITEM, symbol);
+		data.put (JSONKeys.ITEM, getSymbol ());
 		data.put (JSONKeys.CURRENCY, currency);
-		data.put (JSONKeys.SIDE, side.toString ());
-		data.put (JSONKeys.QUANTITY, quantity);
-		data.put (JSONKeys.ORDER_TYPE, orderType.toString ().toLowerCase ());
-		data.put (JSONKeys.PRICE, limit);
-		data.put (JSONKeys.DISPLAY, display);
+		data.put (JSONKeys.SIDE, getSide ().toString ());
+		data.put (JSONKeys.QUANTITY, getQuantity ());
+		data.put (JSONKeys.ORDER_TYPE, getOrderType ().toString ().toLowerCase ());
+		data.put (JSONKeys.PRICE, getLimit ());
+		data.put (JSONKeys.DISPLAY, getDisplay ());
 		setData (data.toString ());
 	}
 	
-	boolean validate () {
-		if (symbol == null) {
-			setError ("Invalid symbol");
-			return false;
-		}
-		if (orderType == null) {
-			setError ("Invalid order type");
-			return false;
-		}
-		if (side == null) {
-			setError ("Invalid order side");
-			return false;
-		}
-		if (Util.round (limit, 2) != limit) {
-			setError ("Limit price can only have up to two decimals");
-			return false;
-		}
-		if (Util.round (quantity, 4) != quantity) {
-			setError ("Quantity can only have up to four decimals");
-			return false;
-		}
-		if (quantity < Util.MIN_SIZE) {
-			setError ("Minimum quantity is " + Util.MIN_SIZE);
-			return false;
-		}
-		if ((orderType == OrderType.LIMIT || orderType == OrderType.RESERVE) && limit < Util.MIN_PRICE) {
-			setError ("Minimum price is " + Util.MIN_PRICE);
-			return false;
-		}
-		if (orderType == OrderType.RESERVE && (display >= quantity || Util.round (display, 4) != display)) {
-			setError ("Invalid display: must be less than quantity and up to four decimals");
-			return false;
-		}
-		if (orderType == OrderType.MARKET && (limit != 0d || display != 0d)) {
-			setError ("Market orders should not have values for limit or display");
-			return false;
-		}
-		if (currency == null) {
-			setError ("Invalid currency: " + currency);
-			return false;
-		}
-		return true;
-	}
-
-	private String symbol;
-	private Side side;
-	private double quantity;
-	private double display;
-	private double limit;
-	private OrderType orderType;
-	private String clientOrderId;
-	private String currency;
+	private OrderParameters params;
 	
 	// internal
 	private int account;
+	private String currency;
 }

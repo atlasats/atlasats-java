@@ -1,5 +1,6 @@
 package com.atlas.websockets;
 
+
 abstract class BayeuxMessage {
 
 	abstract BayeuxMessageType getType ();
